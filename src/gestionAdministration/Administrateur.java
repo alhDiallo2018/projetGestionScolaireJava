@@ -2,9 +2,11 @@ package gestionAdministration;
 
 import javax.swing.*;
 import java.awt.*;
-import javax.swing.border.Border;
+import java.awt.event.ActionEvent;
+//import javax.swing.border.Border;
+import java.awt.event.ActionListener;
 
-public class Administrateur extends JFrame {
+public class Administrateur extends JFrame implements ActionListener{
     public Administrateur() {
         setTitle("Admin Page");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -12,6 +14,7 @@ public class Administrateur extends JFrame {
         // Création de la barre de menu
         JMenuBar menuBar = new JMenuBar();
         menuBar.setLayout(new BoxLayout(menuBar, BoxLayout.Y_AXIS));
+        
         
         // Définir la couleur de fond noire pour chaque menu
         for (int i = 0; i < menuBar.getComponentCount(); i++) {
@@ -54,12 +57,12 @@ public class Administrateur extends JFrame {
         };
 
         // Définir les bordures pour les éléments de menu
-        Border defaultBorder = BorderFactory.createMatteBorder(1, 0, 1, 0, new Color(46, 49, 49));
+        //Border defaultBorder = BorderFactory.createMatteBorder(1, 0, 1, 0, new Color(46, 49, 49));
 
         for (int i = 0; i < menuTitles.length; i++) {
             JMenu menu = new JMenu(menuTitles[i]);
-            menu.setForeground(Color.WHITE); // Définir la couleur du texte
-            menu.setBackground(Color.BLACK); // Définir la couleur de fond
+            menu.setForeground(Color.yellow); // Définir la couleur du texte
+            menu.setBackground(Color.BLUE); // Définir la couleur de fond
             menu.setPreferredSize(new Dimension(menuTitles[i].length() * 10, 30)); // Définir la taille préférée du menu
 
             // Ajouter les options à chaque menu principal
@@ -85,7 +88,7 @@ public class Administrateur extends JFrame {
 
         // Création du panneau pour le contenu principal (dashboard)
         JPanel dashboardPanel = new JPanel();
-        dashboardPanel.setBackground(Color.blue); // Couleur de fond du tableau de bord
+        //dashboardPanel.setBackground(Color.DARK_GRAY); // Couleur de fond du tableau de bord
 
         JButton buttonEtudiant = new JButton("Etudiants\n(effectif total: 2)");
         JButton buttonNiveaux = new JButton("Niveaux\n(effectif total: 3)");
@@ -129,6 +132,8 @@ public class Administrateur extends JFrame {
         buttonAccompagnateurs.setPreferredSize(new Dimension(180,80));
         buttonFile.setPreferredSize(new Dimension(180,80));
 
+        buttonEtudiant.setBackground(Color.YELLOW);
+
 
         // Ajouter le panneau du tableau de bord à droite
         add(dashboardPanel, BorderLayout.CENTER);
@@ -138,9 +143,74 @@ public class Administrateur extends JFrame {
         setLocationRelativeTo(null); // Centrer la fenêtre
 
         setVisible(true);
+
+        buttonEtudiant.addActionListener(this);
+        buttonNiveaux.addActionListener(this);
+        buttonActivites.addActionListener(this);
+        buttonProfesseurs.addActionListener(this);
+        buttonClasses.addActionListener(this);
+        buttonDisciplines.addActionListener(this);
+        buttonParents.addActionListener(this);
+        buttonMatieres.addActionListener(this);
+        buttonChauffeurs.addActionListener(this);
+        buttonSalles.addActionListener(this);
+        buttonExamens.addActionListener(this);
+        buttonAccompagnateurs.addActionListener(this);
+
+        
     }
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource() instanceof JButton){
+            JButton  clickButton = (JButton) e.getSource();
+
+            if(clickButton.getText().equals("Etudiants\n(effectif total: 2)")){
+                
+                AffichageEleve affi =new AffichageEleve();
+                System.out.println(affi+"hello EtudiantPanel");
+            }
+            else if(clickButton.getText().equals("Niveaux\n(effectif total: 3)")){
+                System.out.println("hello NiveauPanel");
+            }
+            else if(clickButton.getText().equals("Activités\n(effectif total: 5)")){
+                System.out.println("hello ActivitesPanel");
+            }
+            else if(clickButton.getText().equals("Professeurs\n(effectif total: 4)")){
+                System.out.println("hello ProfesseursPanel");
+            }
+            else if(clickButton.getText().equals("Classes\n(effectif total: 6)")){
+                System.out.println("hello ClassesPanel");
+            }
+            else if(clickButton.getText().equals("Disciplines\n(effectif total: 8)")){
+                System.out.println("hello DisciplinestPanel");
+            }
+            else if(clickButton.getText().equals("Parents\n(effectif total: 10)")){
+                System.out.println("hello ParentsPanel");
+            }
+            else if(clickButton.getText().equals("Matières\n(effectif total: 7)")){
+                System.out.println("hello MatierestPanel");
+            }
+            else if(clickButton.getText().equals("Chauffeurs\n(effectif total: 9)")){
+                System.out.println("hello ChauffeurstPanel");
+            }
+            else if(clickButton.getText().equals("Salles\n(effectif total: 12)")){
+                System.out.println("hello SallestPanel");
+            }
+            else if(clickButton.getText().equals("Examens\n(effectif total: 15)")){
+                System.out.println("hello ExamensPanel");
+            }
+            else if(clickButton.getText().equals("Accompagnateurs\n(effectif total: 18)")){
+                System.out.println("hello AccompagnateursPanel");
+            }
+        }
+        
+    }
+    
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(Administrateur::new);
     }
+
+
+
 }

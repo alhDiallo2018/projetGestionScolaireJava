@@ -65,22 +65,27 @@ public class SignIn extends JFrame {
                         if (role == 1) { 
                             showMessage("Welcome, Professeur");
                             Professeur prof = new Professeur();
+                            System.out.println(prof+"hello ProfesseurPanel");
                             dispose(); 
                         } else if (role == 2) { 
                             showMessage("Welcome, student!");
                             Eleve eleve = new Eleve();
+                            System.out.println(eleve+"hello EtudiantPanel");
                             dispose(); 
                         }else if (role == 3) { 
                             showMessage("Welcome, Parent/Titeur!");
                             Parent parent = new Parent();
+                            System.out.println(parent+"hello ParentPanel");
                             dispose(); 
                         }else if (role == 4) { 
                             showMessage("Welcome, statut Personnel!");
                            Personnel pers = new Personnel();
+                           System.out.println(pers+"hello PersonnelPanel");
                             dispose(); 
                         }else if (role == 5) { 
                             showMessage("Welcome, admin!");
                             Administrateur admin= new Administrateur(); 
+                            System.out.println(admin+"hello AdminPanel");
                             dispose(); 
                         }
                         else {
