@@ -7,6 +7,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.*;
 
 public class AjoutEleve extends JFrame {
@@ -19,7 +21,7 @@ public class AjoutEleve extends JFrame {
     public AjoutEleve() {
         setTitle("Espace Ajout Eleve");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(700, 300); // Ajustement de la taille de la fenêtre
+        setSize(700, 400); // Ajustement de la taille de la fenêtre
         setLocationRelativeTo(null);
 
         lablnom = new JLabel("Nom");
@@ -104,15 +106,25 @@ public class AjoutEleve extends JFrame {
                 int returnValue = fileChooser.showOpenDialog(null);
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
-                    String absolutePath = selectedFile.getAbsolutePath();
-                    txtphoto.setText(absolutePath);
+                    try {
+                        FileInputStream fis = new FileInputStream(selectedFile);
+                        byte[] imageBytes = new byte[(int) selectedFile.length()];
+                        fis.read(imageBytes);
+                        fis.close();
 
-                    ImageIcon imageIcon = new ImageIcon(absolutePath);
-                    Image image = imageIcon.getImage().getScaledInstance(photoWidth, photoHeight, Image.SCALE_SMOOTH);
-                    photoLabel.setIcon(new ImageIcon(image));
+                        // Chargement de l'image à partir du tableau de bytes
+                        ImageIcon imageIcon = new ImageIcon(imageBytes);
+                        Image image = imageIcon.getImage().getScaledInstance(photoWidth, photoHeight, Image.SCALE_SMOOTH);
+                        photoLabel.setIcon(new ImageIcon(image));
+                        txtphoto.setText(selectedFile.getAbsolutePath()); // Ajout du chemin de fichier dans le champ de texte
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "Erreur lors de la lecture du fichier image", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             }
         });
+
         choisirPhotoBtn.setBounds(photoX, photoY + photoHeight + 10, 150, 25);
 
         JButton enregistrerBtn = new JButton("Enregistrer");
@@ -204,7 +216,7 @@ public class AjoutEleve extends JFrame {
                     pstmt.setString(3, txtdate_naissance.getText());
                     pstmt.setString(4, txtlieu_naissance.getText());
                     pstmt.setString(5, txtsexe.getText());
-                    pstmt.setString(6, txtphoto.getText());
+                    pstmt.setString(6,txtphoto.getText());
                     pstmt.setString(7, txttelephone.getText());
                     pstmt.setString(8, txtmatricule.getText());
                     pstmt.setString(9, txtcni.getText());
@@ -212,23 +224,38 @@ public class AjoutEleve extends JFrame {
                     pstmt.setString(11, txtemail.getText());
                     pstmt.setString(12, txtmot_de_passe.getText());
 
+                    // Lecture de l'image à partir du fichier sélectionné et stockage dans un tableau de bytes
+
+                    File selectedFile = new File(txtphoto.getText());
+                    FileInputStream fis = new FileInputStream(selectedFile);
+                    System.out.println(selectedFile);
+                    /*byte[] imageBytes = new byte[(int) selectedFile.length()];
+                    fis.read(imageBytes);
+                    fis.close();*/
+
+                    // Insérer le tableau de bytes dans la base de données en tant que paramètre de type BLOB
+                   // pstmt.setBytes(6, imageBytes);
+
                     int rowsAffected = pstmt.executeUpdate();
 
                     if (rowsAffected > 0) {
                         System.out.println(rowsAffected + " lignes ont été insérées avec succès.");
-                        // Ou effectuez une autre action en fonction du nombre de lignes affectées
+                        JOptionPane.showMessageDialog(enregistrerBtn, "L'ajout de l'élève a réussi.");
                     } else {
                         System.out.println("Aucune ligne n'a été insérée.");
-                        // Ou gérez le cas où aucune ligne n'a été affectée
+                        JOptionPane.showMessageDialog(enregistrerBtn, "L'ajout de l'élève a échoué.");
                     }
-                } catch (SQLException ex) {
+                } catch (SQLException | IOException ex) {
                     ex.printStackTrace();
+                    JOptionPane.showMessageDialog(enregistrerBtn, "Erreur lors de l'ajout de l'élève : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
+
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(AjoutEleve::new);
     }
 }
+
