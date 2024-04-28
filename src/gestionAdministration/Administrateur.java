@@ -56,7 +56,7 @@ public class Administrateur extends JFrame implements ActionListener{
                 {"Exit"}
         };
 
-        // Définir les bordures pour les éléments de menu
+        //Définir les bordures pour les éléments de menu
         //Border defaultBorder = BorderFactory.createMatteBorder(1, 0, 1, 0, new Color(46, 49, 49));
 
         for (int i = 0; i < menuTitles.length; i++) {

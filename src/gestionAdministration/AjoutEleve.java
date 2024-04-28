@@ -1,17 +1,8 @@
 package gestionAdministration;
 
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.BorderFactory;
-
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.ButtonGroup;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,17 +11,16 @@ import java.sql.*;
 
 public class AjoutEleve extends JFrame {
 
-    public JTextField txtnom, txtprenom, txtdate_naissance, txtlieu_naissance, txtsexe, txttelephone, 
-                      txtmatricule, txtcni, txtrole_id, txtemail, txtmot_de_passe, txtphoto, txtancienEcole, txtstatutecole;
-    public JLabel lablnom, lablprenom, labldate_naissance, labllieu_naissance, lablsexe, labltelephone, 
-                  lablmatricule, lablcni, lablrole_id, lablemail, lablmot_de_passe, photoLabel, lblancienEcole, lblstatutecole;
+    public JTextField txtnom, txtprenom, txtdate_naissance, txtlieu_naissance, txtsexe, txttelephone,
+            txtmatricule, txtcni, txtrole_id, txtemail, txtmot_de_passe, txtphoto, txtancienEcole, txtstatutecole;
+    public JLabel lablnom, lablprenom, labldate_naissance, labllieu_naissance, lablsexe, labltelephone,
+            lablmatricule, lablcni, lablrole_id, lablemail, lablmot_de_passe, photoLabel, lblancienEcole, lblstatutecole;
 
     public AjoutEleve() {
         setTitle("Espace Ajout Eleve");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(700, 300); // Ajustement de la taille de la fenêtre
         setLocationRelativeTo(null);
-        //setLayout(null);
 
         lablnom = new JLabel("Nom");
         txtnom = new JTextField();
@@ -64,10 +54,7 @@ public class AjoutEleve extends JFrame {
 
         lablmot_de_passe = new JLabel("Mot de Passe");
         txtmot_de_passe = new JTextField();
-
-        //this.setTitle("Test radio boutons");
-   
-       
+        txtphoto = new JTextField();
 
         int x = 20, y = 20, width = 120, height = 25;
         int yGap = 30;
@@ -110,7 +97,6 @@ public class AjoutEleve extends JFrame {
         photoLabel.setBounds(photoX, photoY, photoWidth, photoHeight);
 
         JButton choisirPhotoBtn = new JButton("Choisir une photo");
-        
         choisirPhotoBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -118,10 +104,12 @@ public class AjoutEleve extends JFrame {
                 int returnValue = fileChooser.showOpenDialog(null);
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
-                    // Obtenez le chemin absolu du fichier sélectionné
                     String absolutePath = selectedFile.getAbsolutePath();
-                    // Mettez à jour le champ de texte ou l'affichage de votre choix
                     txtphoto.setText(absolutePath);
+
+                    ImageIcon imageIcon = new ImageIcon(absolutePath);
+                    Image image = imageIcon.getImage().getScaledInstance(photoWidth, photoHeight, Image.SCALE_SMOOTH);
+                    photoLabel.setIcon(new ImageIcon(image));
                 }
             }
         });
@@ -162,18 +150,15 @@ public class AjoutEleve extends JFrame {
         add(txtmot_de_passe);
         add(photoLabel);
         add(choisirPhotoBtn);
-        
-
-
 
         // Création du panneau pour les boutons radio
-        JPanel panel = new JPanel(new GridLayout(0,1));
+        JPanel panel = new JPanel(new GridLayout(0, 1));
         TitledBorder border = BorderFactory.createTitledBorder("Sélection");
         panel.setBorder(border);
         lblancienEcole = new JLabel("Ancienne Ecole");
         txtancienEcole = new JTextField();
         lblancienEcole.setForeground(Color.BLUE);
-        
+
         ButtonGroup groupEcole = new ButtonGroup();
         JRadioButton radio1 = new JRadioButton("Crêche", true);
         JRadioButton radio2 = new JRadioButton("Ecole");
@@ -188,113 +173,59 @@ public class AjoutEleve extends JFrame {
         groupEcole.add(radio3);
         panel.add(radio3);
 
-
         lblstatutecole = new JLabel("Statut Ecole");
         ButtonGroup groupStatut = new ButtonGroup();
         JRadioButton radio4 = new JRadioButton("Privée", true);
         JRadioButton radio5 = new JRadioButton("Public");
         lblstatutecole.setForeground(Color.BLUE);
 
-
         panel.add(lblstatutecole);
         groupStatut.add(radio4);
         panel.add(radio4);
         groupStatut.add(radio5);
         panel.add(radio5);
-        
-        
 
-            // Ajout du panneau à la fenêtre principale
+        // Ajout du panneau à la fenêtre principale
         add(panel, BorderLayout.SOUTH); // Ajoute le panneau en bas de la fenêtre principale
-        //ıpanel.setBackground(Color.BLUE);
         panel.add(enregistrerBtn);
-    
 
         setVisible(true);
 
         enregistrerBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String ajouterEleve = "INSERT INTO utilisateur (prenom, nom, date_naissance, lieu_naissance, sexe, photo, telephone, matricule, cni, role_id, email, mot_de_passe) VALUES ('" +
-                    txtprenom.getText() + "', '" +
-                    txtnom.getText() + "', '" +
-                    txtdate_naissance.getText() + "', '" +
-                    txtlieu_naissance.getText() + "', '" +
-                    txtsexe.getText() + "', '" +
-                    // Assuming txtphoto is the file path of the selected photo
-                    txtphoto.getText() + "', '" +
-                    txttelephone.getText() + "', '" +
-                    txtmatricule.getText() + "', '" +
-                    txtcni.getText() + "', '2', '" + 
-                    txtemail.getText() + "', '" +
-                    txtmot_de_passe.getText() + "')";
-        
-                // Insérer l'élève dans la table utilisateur
-                try {
-                    Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/votre_base_de_donnees", "root", "");
-                    Statement stmt = conn.createStatement();
-                    int rowsAffected = stmt.executeUpdate(ajouterEleve);
-        
+                String ajouterEleve = "INSERT INTO utilisateur (prenom, nom, date_naissance, lieu_naissance, sexe, photo, telephone, matricule, cni, role_id, email, mot_de_passe) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+                try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/gestionScolaire", "root", "");
+                     PreparedStatement pstmt = conn.prepareStatement(ajouterEleve)) {
+
+                    pstmt.setString(1, txtprenom.getText());
+                    pstmt.setString(2, txtnom.getText());
+                    pstmt.setString(3, txtdate_naissance.getText());
+                    pstmt.setString(4, txtlieu_naissance.getText());
+                    pstmt.setString(5, txtsexe.getText());
+                    pstmt.setString(6, txtphoto.getText());
+                    pstmt.setString(7, txttelephone.getText());
+                    pstmt.setString(8, txtmatricule.getText());
+                    pstmt.setString(9, txtcni.getText());
+                    pstmt.setString(10, txtrole_id.getText());
+                    pstmt.setString(11, txtemail.getText());
+                    pstmt.setString(12, txtmot_de_passe.getText());
+
+                    int rowsAffected = pstmt.executeUpdate();
+
                     if (rowsAffected > 0) {
                         System.out.println(rowsAffected + " lignes ont été insérées avec succès.");
-                        // Or perform any other action based on the number of rows affected
+                        // Ou effectuez une autre action en fonction du nombre de lignes affectées
                     } else {
                         System.out.println("Aucune ligne n'a été insérée.");
-                        // Or handle the case where no rows were affected
+                        // Ou gérez le cas où aucune ligne n'a été affectée
                     }
-        
-                    // Récupérer l'ID de l'utilisateur inséré
-                    String dernierIdUtilisateur = "SELECT LAST_INSERT_ID()";
-                    int utilisateurId = 0;
-        
-                    ResultSet rs = stmt.executeQuery(dernierIdUtilisateur);
-                    if (rs.next()) {
-                        utilisateurId = rs.getInt(1);
-                    }
-        
-                    // Récupérer le type d'école sélectionné
-                    String typeEcoleSelectionne = "";
-                    if (radio1.isSelected()) {
-                        typeEcoleSelectionne = "Crêche";
-                    } else if (radio2.isSelected()) {
-                        typeEcoleSelectionne = "Ecole";
-                    } else if (radio3.isSelected()) {
-                        typeEcoleSelectionne = "aucune";
-                    }
-        
-                    // Récupérer le statut de l'école sélectionné
-                    String statutEcoleSelectionne = "";
-                    if (radio4.isSelected()) {
-                        statutEcoleSelectionne = "Privée";
-                    } else if (radio5.isSelected()) {
-                        statutEcoleSelectionne = "Public";
-                    }
-        
-                    String ajoutAncienneEcole = "INSERT INTO ancienne_ecole (nom_ecole, type_ecole, statut_ecole, utilisateur_id) VALUES ('" +
-                        txtancienEcole.getText() + "', '" +
-                        typeEcoleSelectionne + "', '" +
-                        statutEcoleSelectionne + "', " +
-                        utilisateurId + ")"; 
-        
-                    int rowsAffected2 = stmt.executeUpdate(ajoutAncienneEcole);
-        
-                    if (rowsAffected2 > 0) {
-                        System.out.println(rowsAffected2 + " lignes ont été insérées avec succès dans la table ancienne_ecole.");
-                        // Or perform any other action based on the number of rows affected
-                    } else {
-                        System.out.println("Aucune ligne n'a été insérée dans la table ancienne_ecole.");
-                        // Or handle the case where no rows were affected
-                    }
-        
-                    conn.close();
                 } catch (SQLException ex) {
                     ex.printStackTrace();
-                    
                 }
             }
         });
-        
-        
     }
 
     public static void main(String[] args) {
