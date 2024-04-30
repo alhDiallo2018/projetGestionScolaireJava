@@ -1,6 +1,6 @@
 package signIn;
 
-import gestionAdministration.Administrateur;
+import  gestionAdministration.Administrateur;
 import gestionEleve.Eleve;
 import gestionParent.Parent;
 import gestionPersonnel.Personnel;
@@ -26,7 +26,7 @@ public class SignIn extends JFrame {
         setLocationRelativeTo(null);
 
         // Chargement de l'image de fond
-        ImageIcon backgroundImage = new ImageIcon("/Users/testad/Pictures/logoEnSup.png");
+        ImageIcon backgroundImage = new ImageIcon("/Users/testad/Pictures/logoIsepD.jpeg");
         Image scaledImage = backgroundImage.getImage().getScaledInstance(400, 500, Image.SCALE_DEFAULT);
         ImageIcon scaledBackgroundImage = new ImageIcon(scaledImage);
         backgroundLabel = new JLabel(scaledBackgroundImage);

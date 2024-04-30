@@ -3,214 +3,388 @@ package gestionAdministration;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-//import javax.swing.border.Border;
 import java.awt.event.ActionListener;
+import java.sql.*;
 
-public class Administrateur extends JFrame implements ActionListener{
+public class Administrateur extends JFrame implements ActionListener {
+    private JPanel dashboardPanel;
+    private JLabel labelEleves, labelProfesseurs, labelChauffeurs;
+    private boolean estConnecte = false;
+    private String nomUtilisateur;
+    private Connection connection;
+    private JTextField nomUtilisateurField;
+    private String prenomUtilisateur;
+    private String photoUtilisateur;
+    private String nomUtilisateurI;
+    private JPanel topPanel; // Ajout d'un champ pour stocker le panneau supérieur
+
     public Administrateur() {
-        setTitle("Admin Page");
+        setTitle("Espace Admin");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Création de la barre de menu
-        JMenuBar menuBar = new JMenuBar();
-        menuBar.setLayout(new BoxLayout(menuBar, BoxLayout.Y_AXIS));
-        
-        
-        // Définir la couleur de fond noire pour chaque menu
-        for (int i = 0; i < menuBar.getComponentCount(); i++) {
-            Component comp = menuBar.getComponent(i);
-            if (comp instanceof JMenu) {
-                JMenu menu = (JMenu) comp;
-                menu.setBackground(Color.BLACK);
-                // Définir la couleur de fond noire pour chaque élément de menu
-                for (int j = 0; j < menu.getMenuComponentCount(); j++) {
-                    Component menuItemComp = menu.getMenuComponent(j);
-                    if (menuItemComp instanceof JMenuItem) {
-                        JMenuItem menuItem = (JMenuItem) menuItemComp;
-                        menuItem.setBackground(Color.BLACK);
-                    }
-                }
-            }
+        // Connexion à la base de données
+        try {
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/gestionScolaire", "root", "");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Erreur de connexion à la base de données: " + e.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
         }
 
-        // Définir les menus principaux et leurs options associées
-        String[] menuTitles = {
-                "Etudiants", "Niveaux", "Activités", "Professeurs", "Classes",
-                "Disciplines", "Parents", "Matières", "Chauffeurs", "Salles",
-                "Examens", "Accompagnateurs", "File"
-        };
+        JPanel topPanel = createTopPanel(); // Création du panneau supérieur
+        JMenuBar menuBar = createMenuBar(); // Création de la barre de menu
 
-        String[][] menuOptions = {
-                {"Ajouter étudiant", "Voir les étudiants"},
-                {"Ajouter niveau", "Voir les niveaux"},
-                {"Ajouter activité", "Voir les activités"},
-                {"Ajouter professeur", "Voir les professeurs"},
-                {"Ajouter classe", "Voir les classes"},
-                {"Ajouter discipline", "Voir les disciplines"},
-                {"Ajouter parent", "Voir les parents"},
-                {"Ajouter matière", "Voir les matières"},
-                {"Ajouter chauffeur", "Voir les chauffeurs"},
-                {"Ajouter salle", "Voir les salles"},
-                {"Ajouter examen", "Voir les examens"},
-                {"Ajouter accompagnateur", "Voir les accompagnateurs"},
-                {"Exit"}
-        };
+        dashboardPanel = new JPanel();
+        dashboardPanel.setLayout(new GridLayout(4, 3));
 
-        //Définir les bordures pour les éléments de menu
-        //Border defaultBorder = BorderFactory.createMatteBorder(1, 0, 1, 0, new Color(46, 49, 49));
+        addButton("Gérer les Élèves (Ajout)", "ajouterEleve");
+        addButton("Gérer les Élèves (Afficher)", "afficherEleves");
+        addButton("Gérer les Cours", "cours");
+        addButton("Gérer les Cours (Afficher)", "afficherCours");
+        addButton("Gérer les Salles", "salles");
+        addButton("Gérer les Salles (Afficher)", "afficherSalles");
+        addButton("Gérer les Professeurs", "professeurs");
+        addButton("Gérer les Professeurs (Afficher)", "afficherProfesseurs");
+        addButton("Gérer les Activités", "activites");
+        addButton("Gérer les Activités (Afficher)", "afficherActivites");
+        addButton("Gérer les Parents", "parents");
+        addButton("Gérer les Parents (Afficher)", "afficherParents");
+        addButton("Gérer les Matières", "matieres");
+        addButton("Gérer les Matières (Afficher)", "afficherMatieres");
+        addButton("Gérer les Niveaux", "niveaux");
+        addButton("Gérer les Niveaux (Afficher)", "afficherNiveaux");
+        addButton("Gérer les Examens", "examens");
+        addButton("Gérer les Examens (Afficher)", "afficherExamens");
+        addButton("Gérer les Chauffeurs", "chauffeurs");
+        addButton("Gérer les Chauffeurs (Afficher)", "afficherChauffeurs");
+        addButton("Gérer les Accompagnateurs", "accompagnateurs");
+        addButton("Gérer les Accompagnateurs (Afficher)", "afficherAccompagnateurs");
 
-        for (int i = 0; i < menuTitles.length; i++) {
-            JMenu menu = new JMenu(menuTitles[i]);
-            menu.setForeground(Color.yellow); // Définir la couleur du texte
-            menu.setBackground(Color.BLUE); // Définir la couleur de fond
-            menu.setPreferredSize(new Dimension(menuTitles[i].length() * 10, 30)); // Définir la taille préférée du menu
-
-            // Ajouter les options à chaque menu principal
-            for (String option : menuOptions[i]) {
-                JMenuItem menuItem = new JMenuItem(option);
-                menuItem.setBackground(new Color(46, 49, 49)); // Définir la couleur de fond de l'élément de menu
-                menuItem.setForeground(Color.WHITE); // Définir la couleur du texte de l'élément de menu
-                menu.add(menuItem);
-            }
-
-            // Ajouter le menu à la barre de menu
-            menuBar.add(menu);
-        }
-
-        // Créer un JPanel pour contenir la barre de menu
-        JPanel menuPanel = new JPanel();
-        menuPanel.setLayout(new BorderLayout());
-        // menuPanel.setBackground(Color.YELLOW); // Couleur de fond jaune
-        menuPanel.add(menuBar, BorderLayout.NORTH); // Ajouter la barre de menu au panel
-
-        // Ajouter le panel de menu à la fenêtre
-        add(menuPanel, BorderLayout.WEST);
-
-        // Création du panneau pour le contenu principal (dashboard)
-        JPanel dashboardPanel = new JPanel();
-        //dashboardPanel.setBackground(Color.DARK_GRAY); // Couleur de fond du tableau de bord
-
-        JButton buttonEtudiant = new JButton("Etudiants\n(effectif total: 2)");
-        JButton buttonNiveaux = new JButton("Niveaux\n(effectif total: 3)");
-        JButton buttonActivites = new JButton("Activités\n(effectif total: 5)");
-        JButton buttonProfesseurs = new JButton("Professeurs\n(effectif total: 4)");
-        JButton buttonClasses = new JButton("Classes\n(effectif total: 6)");
-        JButton buttonDisciplines = new JButton("Disciplines\n(effectif total: 8)");
-        JButton buttonParents = new JButton("Parents\n(effectif total: 10)");
-        JButton buttonMatieres = new JButton("Matières\n(effectif total: 7)");
-        JButton buttonChauffeurs = new JButton("Chauffeurs\n(effectif total: 9)");
-        JButton buttonSalles = new JButton("Salles\n(effectif total: 12)");
-        JButton buttonExamens = new JButton("Examens\n(effectif total: 15)");
-        JButton buttonAccompagnateurs = new JButton("Accompagnateurs\n(effectif total: 18)");
-        JButton buttonFile = new JButton("File");
-
-        dashboardPanel.add(buttonEtudiant);
-        dashboardPanel.add(buttonNiveaux);
-        dashboardPanel.add(buttonActivites);
-        dashboardPanel.add(buttonProfesseurs);
-        dashboardPanel.add(buttonClasses);
-        dashboardPanel.add(buttonDisciplines);
-        dashboardPanel.add(buttonParents);
-        dashboardPanel.add(buttonMatieres);
-        dashboardPanel.add(buttonChauffeurs);
-        dashboardPanel.add(buttonSalles);
-        dashboardPanel.add(buttonExamens);
-        dashboardPanel.add(buttonAccompagnateurs);
-        dashboardPanel.add(buttonFile);
-
-        buttonEtudiant.setPreferredSize(new Dimension(180,80));
-        buttonNiveaux.setPreferredSize(new Dimension(180,80));
-        buttonActivites.setPreferredSize(new Dimension(180,80));
-        buttonProfesseurs.setPreferredSize(new Dimension(180,80));
-        buttonClasses.setPreferredSize(new Dimension(180,80));
-        buttonDisciplines.setPreferredSize(new Dimension(180,80));
-        buttonParents.setPreferredSize(new Dimension(180,80));
-        buttonMatieres.setPreferredSize(new Dimension(180,80));
-        buttonChauffeurs.setPreferredSize(new Dimension(180,80));
-        buttonSalles.setPreferredSize(new Dimension(180,80));
-        buttonExamens.setPreferredSize(new Dimension(180,80));
-        buttonAccompagnateurs.setPreferredSize(new Dimension(180,80));
-        buttonFile.setPreferredSize(new Dimension(180,80));
-
-        buttonEtudiant.setBackground(Color.YELLOW);
-
-
-        // Ajouter le panneau du tableau de bord à droite
+        add(topPanel, BorderLayout.NORTH);
+        add(menuBar, BorderLayout.WEST);
         add(dashboardPanel, BorderLayout.CENTER);
 
-        // Adapter la taille de la fenêtre
+        labelEleves = new JLabel("Nombre d'élèves: " + getNombreEnregistrements(2));
+        labelProfesseurs = new JLabel("Nombre de professeurs: " + getNombreEnregistrements(3));
+        labelChauffeurs = new JLabel("Nombre de chauffeurs: " + getNombreEnregistrements(4));
+
+        dashboardPanel.add(labelEleves);
+        dashboardPanel.add(labelProfesseurs);
+        dashboardPanel.add(labelChauffeurs);
+
         pack();
-        setLocationRelativeTo(null); // Centrer la fenêtre
+        setLocationRelativeTo(null);
 
-        setVisible(true);
-
-        buttonEtudiant.addActionListener(this);
-        buttonNiveaux.addActionListener(this);
-        buttonActivites.addActionListener(this);
-        buttonProfesseurs.addActionListener(this);
-        buttonClasses.addActionListener(this);
-        buttonDisciplines.addActionListener(this);
-        buttonParents.addActionListener(this);
-        buttonMatieres.addActionListener(this);
-        buttonChauffeurs.addActionListener(this);
-        buttonSalles.addActionListener(this);
-        buttonExamens.addActionListener(this);
-        buttonAccompagnateurs.addActionListener(this);
-
-        
+        verifierConnexion();
     }
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if(e.getSource() instanceof JButton){
-            JButton  clickButton = (JButton) e.getSource();
 
-            if(clickButton.getText().equals("Etudiants\n(effectif total: 2)")){
-                
-                AffichageEleve affi =new AffichageEleve();
-                System.out.println(affi+"hello EtudiantPanel");
-            }
-            else if(clickButton.getText().equals("Niveaux\n(effectif total: 3)")){
-                System.out.println("hello NiveauPanel");
-            }
-            else if(clickButton.getText().equals("Activités\n(effectif total: 5)")){
-                System.out.println("hello ActivitesPanel");
-            }
-            else if(clickButton.getText().equals("Professeurs\n(effectif total: 4)")){
-                System.out.println("hello ProfesseursPanel");
-            }
-            else if(clickButton.getText().equals("Classes\n(effectif total: 6)")){
-                System.out.println("hello ClassesPanel");
-            }
-            else if(clickButton.getText().equals("Disciplines\n(effectif total: 8)")){
-                System.out.println("hello DisciplinestPanel");
-            }
-            else if(clickButton.getText().equals("Parents\n(effectif total: 10)")){
-                System.out.println("hello ParentsPanel");
-            }
-            else if(clickButton.getText().equals("Matières\n(effectif total: 7)")){
-                System.out.println("hello MatierestPanel");
-            }
-            else if(clickButton.getText().equals("Chauffeurs\n(effectif total: 9)")){
-                System.out.println("hello ChauffeurstPanel");
-            }
-            else if(clickButton.getText().equals("Salles\n(effectif total: 12)")){
-                System.out.println("hello SallestPanel");
-            }
-            else if(clickButton.getText().equals("Examens\n(effectif total: 15)")){
-                System.out.println("hello ExamensPanel");
-            }
-            else if(clickButton.getText().equals("Accompagnateurs\n(effectif total: 18)")){
-                System.out.println("hello AccompagnateursPanel");
+    private void verifierConnexion() {
+        if (!estConnecte) {
+            // Si l'utilisateur n'est pas connecté, affichez la fenêtre de connexion
+            afficherFenetreConnexion();
+        } else {
+            // Vérifier le rôle de l'utilisateur connecté
+            int role_id = getRoleId();
+
+            if (role_id != 5) {
+                // Si le rôle de l'utilisateur n'est pas administrateur, affichez un message d'erreur et fermez l'application
+                JOptionPane.showMessageDialog(this, "Vous n'avez pas les droits d'accès requis.", "Erreur d'accès", JOptionPane.ERROR_MESSAGE);
+                System.exit(0);
+            } else {
+                // L'utilisateur est connecté avec succès, appelez createTopPanel() ici
+                createTopPanel(); // Appel de createTopPanel() lorsque l'utilisateur est connecté
+                setVisible(true); // Afficher la fenêtre principale après la connexion réussie
             }
         }
-        
     }
-    
 
+    private void afficherFenetreConnexion() {
+        JFrame fenetreConnexion = new JFrame("Connexion");
+        fenetreConnexion.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        fenetreConnexion.setSize(300, 150);
+        fenetreConnexion.setLayout(new GridLayout(3, 2));
+
+        // Utilisez la variable de classe nomUtilisateurField
+        nomUtilisateurField = new JTextField();
+        JPasswordField motDePasseField = new JPasswordField();
+
+        JButton boutonConnexion = new JButton("Connexion");
+        boutonConnexion.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String nomUtilisateur = nomUtilisateurField.getText();
+                String motDePasse = new String(motDePasseField.getPassword());
+
+                if (verifierConnexion(nomUtilisateur, motDePasse)) {
+                    estConnecte = true;
+                    // Récupérer le prénom, le nom et la photo de l'utilisateur à partir de la base de données
+                    // et les stocker dans les champs de classe appropriés
+                    recupererInformationsUtilisateur(nomUtilisateur);
+                    fenetreConnexion.setVisible(false);
+                    setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(fenetreConnexion, "Nom d'utilisateur ou mot de passe incorrect.", "Erreur de connexion", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        fenetreConnexion.add(new JLabel("Nom d'utilisateur:"));
+        fenetreConnexion.add(nomUtilisateurField);
+        fenetreConnexion.add(new JLabel("Mot de passe:"));
+        fenetreConnexion.add(motDePasseField);
+        fenetreConnexion.add(new JLabel()); // Espace vide pour aligner les boutons
+        fenetreConnexion.add(boutonConnexion);
+
+        fenetreConnexion.setVisible(true); // Affichez la fenêtre de connexion
+    }
+
+    private boolean verifierConnexion(String nomUtilisateur, String motDePasse) {
+        boolean authentifie = false;
+
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM utilisateur WHERE email = ? AND mot_de_passe = ?")) {
+            statement.setString(1, nomUtilisateur);
+            statement.setString(2, motDePasse);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                authentifie = resultSet.next();
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Erreur de base de données: " + e.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+        }
+
+        return authentifie;
+    }
+
+    private int getRoleId() {
+        int role_id = 0;
+        try (PreparedStatement statement = connection.prepareStatement("SELECT role_id FROM utilisateur WHERE email = ? AND mot_de_passe = ?")) {
+            statement.setString(1, nomUtilisateur);
+            statement.setString(2, "");
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    role_id = resultSet.getInt("role_id");
+                }
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Erreur de base de données: " + e.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+        }
+        return role_id;
+    }
+
+    private int getNombreEnregistrements(int role_id) {
+        int count = 0;
+        try (PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM utilisateur WHERE role_id = ?")) {
+            statement.setInt(1, role_id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    count = resultSet.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Erreur de base de données: " + e.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+        }
+        return count;
+    }
+
+    private void recupererInformationsUtilisateur(String nomUtilisateur) {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT prenom, nom, photo FROM utilisateur WHERE email = ?")) {
+            statement.setString(1, nomUtilisateur);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    prenomUtilisateur = resultSet.getString("prenom");
+                    nomUtilisateurI = resultSet.getString("nom");
+                    photoUtilisateur = resultSet.getString("photo");
+                    // Afficher les valeurs récupérées à la console pour déboguer
+                    System.out.println("Prénom: " + prenomUtilisateur);
+                    System.out.println("Nom: " + nomUtilisateurI);
+                    System.out.println("Photo: " + photoUtilisateur);
+                    // Mettre à jour le panneau supérieur après avoir récupéré les informations de l'utilisateur
+                    updateTopPanel();
+                } else {
+                    System.out.println("Aucun résultat trouvé pour l'utilisateur: " + nomUtilisateur);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private JPanel createTopPanel() {
+        topPanel = new JPanel(); // Utilisation du champ de classe pour le panneau supérieur
+        topPanel.setLayout(new BorderLayout());
+
+        // Afficher l'image de profil
+        if (photoUtilisateur != null && !photoUtilisateur.isEmpty()) {
+            ImageIcon profileImage = new ImageIcon(photoUtilisateur);
+            JLabel profileLabel = new JLabel(profileImage);
+            topPanel.add(profileLabel, BorderLayout.WEST);
+        } else {
+            // Si le chemin de la photo est null ou vide, afficher une image par défaut
+            ImageIcon defaultImage = new ImageIcon("/Users/testad/Desktop/Pharmashop/images/logo.png");
+            JLabel defaultLabel = new JLabel(defaultImage);
+            topPanel.add(defaultLabel, BorderLayout.WEST);
+        }
+
+        // Afficher le prénom et le nom de l'utilisateur
+        if (prenomUtilisateur != null && nomUtilisateurI != null) {
+            JLabel nameLabel = new JLabel(prenomUtilisateur + " " + nomUtilisateurI);
+            topPanel.add(nameLabel, BorderLayout.CENTER);
+        }
+
+        // Ajouter le bouton de déconnexion
+        JButton logoutButton = new JButton("Déconnexion");
+        logoutButton.addActionListener(e -> {
+            int choice = JOptionPane.showConfirmDialog(this, "Voulez-vous vraiment vous déconnecter ?", "Déconnexion", JOptionPane.YES_NO_OPTION);
+            if (choice == JOptionPane.YES_OPTION) {
+                // Effectuer les actions de déconnexion ici
+                // Par exemple, fermer la fenêtre actuelle et afficher la fenêtre de connexion
+                setVisible(false); // Masquer la fenêtre actuelle
+                afficherFenetreConnexion(); // Afficher la fenêtre de connexion
+            }
+        });
+        topPanel.add(logoutButton, BorderLayout.EAST);
+
+        return topPanel;
+    }
+
+
+    private void updateTopPanel() {
+        // Supprimer tous les composants du panneau supérieur pour une mise à jour propre
+        topPanel.removeAll();
+
+        // Mettre à jour l'image de profil
+        if (photoUtilisateur != null && !photoUtilisateur.isEmpty()) {
+            ImageIcon profileImage = new ImageIcon(photoUtilisateur);
+            JLabel profileLabel = new JLabel(profileImage);
+            topPanel.add(profileLabel, BorderLayout.WEST);
+        } else {
+            // Si le chemin de la photo est null ou vide, afficher une image par défaut
+            ImageIcon defaultImage = new ImageIcon("/Users/testad/Desktop/Pharmashop/images/background.jpeg");
+            JLabel defaultLabel = new JLabel(defaultImage);
+            topPanel.add(defaultLabel, BorderLayout.WEST);
+        }
+
+        // Mettre à jour le prénom et le nom de l'utilisateur
+        if (prenomUtilisateur != null && nomUtilisateurI != null) {
+            JLabel nameLabel = new JLabel("Bienvenue dans l'espace administratif "+ prenomUtilisateur + " " + nomUtilisateurI);
+            topPanel.add(nameLabel, BorderLayout.CENTER);
+        }
+
+        // Ajouter le bouton de déconnexion
+        JButton logoutButton = new JButton("Déconnexion");
+        logoutButton.addActionListener(e -> {
+            int choice = JOptionPane.showConfirmDialog(this, "Voulez-vous vraiment vous déconnecter ?", "Déconnexion", JOptionPane.YES_NO_OPTION);
+            if (choice == JOptionPane.YES_OPTION) {
+                // Effectuer les actions de déconnexion ici
+                // Par exemple, fermer la fenêtre actuelle et afficher la fenêtre de connexion
+                setVisible(false); // Masquer la fenêtre actuelle
+                afficherFenetreConnexion(); // Afficher la fenêtre de connexion
+            }
+        });
+        topPanel.add(logoutButton, BorderLayout.EAST);
+
+        // Rafraîchir l'interface utilisateur pour refléter les changements
+        topPanel.revalidate();
+        topPanel.repaint();
+    }
+
+
+    private JMenuBar createMenuBar() {
+        JMenuBar menuBar = new JMenuBar();
+        JMenu menu = new JMenu("Fichier");
+        JMenuItem exitMenuItem = new JMenuItem("Quitter");
+
+        exitMenuItem.addActionListener(e -> System.exit(0));
+
+        menu.add(exitMenuItem);
+        menuBar.add(menu);
+
+        return menuBar;
+    }
+
+    private void addButton(String text, String actionCommand) {
+        JButton button = new JButton(text);
+        button.setActionCommand(actionCommand);
+        button.addActionListener(this);
+        dashboardPanel.add(button);
+    }
+
+    // Gérer les actions des boutons du tableau de bord
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String actionCommand = e.getActionCommand();
+        switch (actionCommand) {
+            case "ajouterEleve":
+                new AjoutEleve();
+                break;
+            case "afficherEleves":
+                new AffichageEleve();
+                break;
+            case "cours":
+                JOptionPane.showMessageDialog(this, "Gérer les cours");
+                break;
+            case "afficherCours":
+                JOptionPane.showMessageDialog(this, "Afficher les cours");
+                break;
+            case "salles":
+                JOptionPane.showMessageDialog(this, "Gérer les salles");
+                break;
+            case "afficherSalles":
+                JOptionPane.showMessageDialog(this, "Afficher les salles");
+                break;
+            case "professeurs":
+                JOptionPane.showMessageDialog(this, "Gérer les professeurs");
+                break;
+            case "afficherProfesseurs":
+                JOptionPane.showMessageDialog(this, "Afficher les professeurs");
+                break;
+            case "activites":
+                JOptionPane.showMessageDialog(this, "Gérer les activités");
+                break;
+            case "afficherActivites":
+                JOptionPane.showMessageDialog(this, "Afficher les activités");
+                break;
+            case "parents":
+                JOptionPane.showMessageDialog(this, "Gérer les parents");
+                break;
+            case "afficherParents":
+                JOptionPane.showMessageDialog(this, "Afficher les parents");
+                break;
+            case "matieres":
+                JOptionPane.showMessageDialog(this, "Gérer les matières");
+                break;
+            case "afficherMatieres":
+                JOptionPane.showMessageDialog(this, "Afficher les matières");
+                break;
+            case "niveaux":
+                JOptionPane.showMessageDialog(this, "Gérer les niveaux");
+                break;
+            case "afficherNiveaux":
+                JOptionPane.showMessageDialog(this, "Afficher les niveaux");
+                break;
+            case "examens":
+                JOptionPane.showMessageDialog(this, "Gérer les examens");
+                break;
+            case "afficherExamens":
+                JOptionPane.showMessageDialog(this, "Afficher les examens");
+                break;
+            case "chauffeurs":
+                JOptionPane.showMessageDialog(this, "Gérer les chauffeurs");
+                break;
+            case "afficherChauffeurs":
+                JOptionPane.showMessageDialog(this, "Afficher les chauffeurs");
+                break;
+            case "accompagnateurs":
+                JOptionPane.showMessageDialog(this, "Gérer les accompagnateurs");
+                break;
+            case "afficherAccompagnateurs":
+                JOptionPane.showMessageDialog(this, "Afficher les accompagnateurs");
+                break;
+            default:
+                break;
+        }
+    }
+
+    // Méthode principale pour tester la classe Administrateur
     public static void main(String[] args) {
         SwingUtilities.invokeLater(Administrateur::new);
     }
-
-
-
 }
