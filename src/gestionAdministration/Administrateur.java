@@ -1,5 +1,11 @@
 package gestionAdministration;
 
+import gestionActivite.*;
+import gestionCours.*;
+import gestionMatiere.*;
+import gestionSalle.*;
+import gestionNiveau.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -16,6 +22,7 @@ public class Administrateur extends JFrame implements ActionListener {
     private String prenomUtilisateur;
     private String photoUtilisateur;
     private String nomUtilisateurI;
+    private String sexeUtilisateur;
     private JPanel topPanel; // Ajout d'un champ pour stocker le panneau supérieur
 
     public Administrateur() {
@@ -185,13 +192,14 @@ public class Administrateur extends JFrame implements ActionListener {
     }
 
     private void recupererInformationsUtilisateur(String nomUtilisateur) {
-        try (PreparedStatement statement = connection.prepareStatement("SELECT prenom, nom, photo FROM utilisateur WHERE email = ?")) {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT prenom, nom, photo, sexe FROM utilisateur WHERE email = ?")) {
             statement.setString(1, nomUtilisateur);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     prenomUtilisateur = resultSet.getString("prenom");
                     nomUtilisateurI = resultSet.getString("nom");
                     photoUtilisateur = resultSet.getString("photo");
+                    sexeUtilisateur = resultSet.getString("sexe");
                     // Afficher les valeurs récupérées à la console pour déboguer
                     System.out.println("Prénom: " + prenomUtilisateur);
                     System.out.println("Nom: " + nomUtilisateurI);
@@ -223,9 +231,14 @@ public class Administrateur extends JFrame implements ActionListener {
             topPanel.add(defaultLabel, BorderLayout.WEST);
         }
 
-        // Afficher le prénom et le nom de l'utilisateur
-        if (prenomUtilisateur != null && nomUtilisateurI != null) {
-            JLabel nameLabel = new JLabel(prenomUtilisateur + " " + nomUtilisateurI);
+        if (prenomUtilisateur != null && nomUtilisateurI != null && sexeUtilisateur != null) {
+            String genderText = "";
+            if(sexeUtilisateur.equalsIgnoreCase("masculin")) {
+                genderText = "Monsieur ";
+            } else if(sexeUtilisateur.equalsIgnoreCase("feminin")) {
+                genderText = "Madame ";
+            }
+            JLabel nameLabel = new JLabel("Bienvenue dans votre espace admin, " + genderText + prenomUtilisateur + " " + nomUtilisateurI);
             topPanel.add(nameLabel, BorderLayout.CENTER);
         }
 
@@ -262,9 +275,14 @@ public class Administrateur extends JFrame implements ActionListener {
             topPanel.add(defaultLabel, BorderLayout.WEST);
         }
 
-        // Mettre à jour le prénom et le nom de l'utilisateur
-        if (prenomUtilisateur != null && nomUtilisateurI != null) {
-            JLabel nameLabel = new JLabel("Bienvenue dans l'espace administratif "+ prenomUtilisateur + " " + nomUtilisateurI);
+        if (prenomUtilisateur != null && nomUtilisateurI != null && sexeUtilisateur != null) {
+            String genderText = "";
+            if(sexeUtilisateur.equalsIgnoreCase("masculin")) {
+                genderText = "Monsieur ";
+            } else if(sexeUtilisateur.equalsIgnoreCase("feminin")) {
+                genderText = "Madame ";
+            }
+            JLabel nameLabel = new JLabel("Bienvenue dans votre espace admin, " + genderText + prenomUtilisateur + " " + nomUtilisateurI);
             topPanel.add(nameLabel, BorderLayout.CENTER);
         }
 
@@ -313,64 +331,64 @@ public class Administrateur extends JFrame implements ActionListener {
         String actionCommand = e.getActionCommand();
         switch (actionCommand) {
             case "ajouterEleve":
-                new AjoutEleve();
+               new AjoutEleve();
                 break;
             case "afficherEleves":
                 new AffichageEleve();
                 break;
             case "cours":
-                JOptionPane.showMessageDialog(this, "Gérer les cours");
+                new AjoutCours();
                 break;
             case "afficherCours":
-                JOptionPane.showMessageDialog(this, "Afficher les cours");
+                new ListerCours();
                 break;
             case "salles":
-                JOptionPane.showMessageDialog(this, "Gérer les salles");
+                new ajoutSalle();
                 break;
             case "afficherSalles":
-                JOptionPane.showMessageDialog(this, "Afficher les salles");
+                new listerSalle();
                 break;
             case "professeurs":
-                JOptionPane.showMessageDialog(this, "Gérer les professeurs");
+                new AjoutProf();
                 break;
             case "afficherProfesseurs":
-                JOptionPane.showMessageDialog(this, "Afficher les professeurs");
+                new AffichageProfessur();
                 break;
             case "activites":
-                JOptionPane.showMessageDialog(this, "Gérer les activités");
+                new ajoutActivite();
                 break;
             case "afficherActivites":
-                JOptionPane.showMessageDialog(this, "Afficher les activités");
-                break;
-            case "parents":
-                JOptionPane.showMessageDialog(this, "Gérer les parents");
-                break;
-            case "afficherParents":
-                JOptionPane.showMessageDialog(this, "Afficher les parents");
+                new listerActivite();
                 break;
             case "matieres":
-                JOptionPane.showMessageDialog(this, "Gérer les matières");
+                new ajoutMatiere();
                 break;
             case "afficherMatieres":
-                JOptionPane.showMessageDialog(this, "Afficher les matières");
+                new listerMatiere();
                 break;
             case "niveaux":
-                JOptionPane.showMessageDialog(this, "Gérer les niveaux");
+                new ajouterNiveau();
                 break;
             case "afficherNiveaux":
-                JOptionPane.showMessageDialog(this, "Afficher les niveaux");
+                new listerNiveau();
                 break;
             case "examens":
-                JOptionPane.showMessageDialog(this, "Gérer les examens");
+                JOptionPane.showMessageDialog(this, "Gérer les examens dans le administrateur");
                 break;
             case "afficherExamens":
-                JOptionPane.showMessageDialog(this, "Afficher les examens");
+                JOptionPane.showMessageDialog(this, "afficher les examens dans le programme !");
                 break;
             case "chauffeurs":
                 JOptionPane.showMessageDialog(this, "Gérer les chauffeurs");
                 break;
             case "afficherChauffeurs":
                 JOptionPane.showMessageDialog(this, "Afficher les chauffeurs");
+                break;
+            case "parents":
+                JOptionPane.showMessageDialog(this, "Gérer les parents");
+                break;
+            case "afficherParents":
+                JOptionPane.showMessageDialog(this, "Afficher les parent");
                 break;
             case "accompagnateurs":
                 JOptionPane.showMessageDialog(this, "Gérer les accompagnateurs");

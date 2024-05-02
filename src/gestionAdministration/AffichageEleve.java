@@ -12,7 +12,7 @@ import java.net.URL;
 import java.sql.*;
 
 public class AffichageEleve extends JFrame {
-    private static final String[] COLUMN_NAMES = {"ID", "Prénoms", "Noms", "Date de naissance", "Lieu de naissance", "Sexe", "Photo", "Téléphone", "Matricule", "CNI", "Email", "Modifier", "Supprimer", "Voir Plus"};
+    private static final String[] COLUMN_NAMES = {"ID", "Prénoms", "Noms", "Date de naissance", "Lieu de naissance", "Sexe", "Photo", "Téléphone", "Matricule", "CNI","Role", "Email", "Modifier", "Supprimer", "Voir Plus"};
     private static final String SELECT_QUERY = "SELECT * FROM utilisateur WHERE role_id = 2";
     private boolean nouvellePhotoSelectionnee = false;
 

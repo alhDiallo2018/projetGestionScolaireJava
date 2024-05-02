@@ -1,261 +1,858 @@
 package gestionAdministration;
 
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.BorderFactory;
+/*import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 public class AjoutEleve extends JFrame {
-
-    public JTextField txtnom, txtprenom, txtdate_naissance, txtlieu_naissance, txtsexe, txttelephone,
-            txtmatricule, txtcni, txtrole_id, txtemail, txtmot_de_passe, txtphoto, txtancienEcole, txtstatutecole;
-    public JLabel lablnom, lablprenom, labldate_naissance, labllieu_naissance, lablsexe, labltelephone,
-            lablmatricule, lablcni, lablrole_id, lablemail, lablmot_de_passe, photoLabel, lblancienEcole, lblstatutecole;
+    private JTextField textFieldPrenom;
+    private JTextField textFieldNom;
+    private JTextField textFieldDateNaissance;
+    private JTextField textFieldLieuNaissance;
+    private JComboBox<String> comboBoxSexe;
+    private JTextField textFieldTelephone;
+    private JTextField textFieldMatricule;
+    private JTextField textFieldCNI;
+    private JComboBox<String> comboBoxClasse;
+    private JComboBox<String> comboBoxNiveau;
+    private JTextField textFieldNomEcole;
+    private JTextField textFieldTypeEcole;
+    private JTextField textFieldStatutEcole;
+    private JTextField textFieldEmail;
+    private JPasswordField passwordField;
+    private JTextField textFieldFrais;
+    private JComboBox<String> comboBoxTypeFrais;
+    private Connection connexion;
+    private JLabel labelPhoto;
+    private String cheminPhoto = "";
 
     public AjoutEleve() {
-        setTitle("Espace Ajout Eleve");
+        setTitle("Ajouter un élève");
+        setSize(600, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(700, 400); // Ajustement de la taille de la fenêtre
         setLocationRelativeTo(null);
 
-        lablnom = new JLabel("Nom");
-        txtnom = new JTextField();
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        setContentPane(mainPanel);
 
-        lablprenom = new JLabel("Prénom");
-        txtprenom = new JTextField();
+        JPanel inputPanel = new JPanel(new GridLayout(19, 2)); // Augmentation du nombre de lignes
+        mainPanel.add(inputPanel, BorderLayout.CENTER);
 
-        labldate_naissance = new JLabel("Date de Naissance");
-        txtdate_naissance = new JTextField();
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
-        labllieu_naissance = new JLabel("Lieu de Naissance");
-        txtlieu_naissance = new JTextField();
+        // JPanel pour la photo et le bouton "Ajouter une photo"
+        JPanel photoPanel = new JPanel(new BorderLayout());
+        mainPanel.add(photoPanel, BorderLayout.EAST);
 
-        lablsexe = new JLabel("Sexe");
-        txtsexe = new JTextField();
+        JPanel photoButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        photoPanel.add(photoButtonPanel, BorderLayout.NORTH);
 
-        labltelephone = new JLabel("Téléphone");
-        txttelephone = new JTextField();
+        // JLabel pour afficher la photo
+        labelPhoto = new JLabel("Aucune photo sélectionnée", SwingConstants.CENTER);
+        photoPanel.add(labelPhoto, BorderLayout.CENTER);
 
-        lablmatricule = new JLabel("Matricule");
-        txtmatricule = new JTextField();
+        // Bouton pour ajouter une photo
+        JButton boutonAjouterPhoto = new JButton("Ajouter photo");
+        photoButtonPanel.add(boutonAjouterPhoto);
 
-        lablcni = new JLabel("CNI");
-        txtcni = new JTextField();
-
-        lablrole_id = new JLabel("Rôle ID");
-        txtrole_id = new JTextField();
-
-        lablemail = new JLabel("Email");
-        txtemail = new JTextField();
-
-        lablmot_de_passe = new JLabel("Mot de Passe");
-        txtmot_de_passe = new JTextField();
-        txtphoto = new JTextField();
-
-        int x = 20, y = 20, width = 120, height = 25;
-        int yGap = 30;
-
-        lablnom.setBounds(x, y, width, height);
-        txtnom.setBounds(x + 150, y, width, height);
-
-        lablprenom.setBounds(x, y + yGap, width, height);
-        txtprenom.setBounds(x + 150, y + yGap, width, height);
-
-        labldate_naissance.setBounds(x, y + 2 * yGap, width, height);
-        txtdate_naissance.setBounds(x + 150, y + 2 * yGap, width, height);
-
-        labllieu_naissance.setBounds(x, y + 3 * yGap, width, height);
-        txtlieu_naissance.setBounds(x + 150, y + 3 * yGap, width, height);
-
-        lablsexe.setBounds(x, y + 4 * yGap, width, height);
-        txtsexe.setBounds(x + 150, y + 4 * yGap, width, height);
-
-        labltelephone.setBounds(x, y + 5 * yGap, width, height);
-        txttelephone.setBounds(x + 150, y + 5 * yGap, width, height);
-
-        lablmatricule.setBounds(x, y + 6 * yGap, width, height);
-        txtmatricule.setBounds(x + 150, y + 6 * yGap, width, height);
-
-        lablcni.setBounds(x, y + 7 * yGap, width, height);
-        txtcni.setBounds(x + 150, y + 7 * yGap, width, height);
-
-        lablrole_id.setBounds(x, y + 8 * yGap, width, height);
-        txtrole_id.setBounds(x + 150, y + 8 * yGap, width, height);
-
-        lablemail.setBounds(x, y + 9 * yGap, width, height);
-        txtemail.setBounds(x + 150, y + 9 * yGap, width, height);
-
-        lablmot_de_passe.setBounds(x, y + 10 * yGap, width, height);
-        txtmot_de_passe.setBounds(x + 150, y + 10 * yGap, width, height);
-
-        int photoX = 450, photoY = 20, photoWidth = 200, photoHeight = 200;
-        photoLabel = new JLabel();
-        photoLabel.setBounds(photoX, photoY, photoWidth, photoHeight);
-
-        JButton choisirPhotoBtn = new JButton("Choisir une photo");
-        choisirPhotoBtn.addActionListener(new ActionListener() {
-            @Override
+        boutonAjouterPhoto.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fileChooser = new JFileChooser();
                 int returnValue = fileChooser.showOpenDialog(null);
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
-                    try {
-                        FileInputStream fis = new FileInputStream(selectedFile);
-                        byte[] imageBytes = new byte[(int) selectedFile.length()];
-                        fis.read(imageBytes);
-                        fis.close();
+                    cheminPhoto = selectedFile.getAbsolutePath();
+                    JOptionPane.showMessageDialog(AjoutEleve.this, "Photo sélectionnée : " + cheminPhoto);
 
-                        // Chargement de l'image à partir du tableau de bytes
-                        ImageIcon imageIcon = new ImageIcon(imageBytes);
-                        Image image = imageIcon.getImage().getScaledInstance(photoWidth, photoHeight, Image.SCALE_SMOOTH);
-                        photoLabel.setIcon(new ImageIcon(image));
-                        txtphoto.setText(selectedFile.getAbsolutePath()); // Ajout du chemin de fichier dans le champ de texte
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                        JOptionPane.showMessageDialog(null, "Erreur lors de la lecture du fichier image", "Erreur", JOptionPane.ERROR_MESSAGE);
-                    }
+                    // Afficher la photo sélectionnée
+                    afficherPhoto();
                 }
             }
         });
 
-        choisirPhotoBtn.setBounds(photoX, photoY + photoHeight + 10, 150, 25);
+        // Ajout des composants pour les champs de saisie
 
-        JButton enregistrerBtn = new JButton("Enregistrer");
-        enregistrerBtn.setBounds(x, y + 11 * yGap, 150, 25);
+        JLabel labelPrenom = new JLabel("Prénom:");
+        inputPanel.add(labelPrenom);
 
-        // Ajustement de la taille de la fenêtre en fonction des composants
-        int windowHeight = (y + 12 * yGap) + 40; // Ajoute une marge de 40 pixels en bas
-        int windowWidth = photoX + photoWidth + 30; // Ajoute une marge de 30 pixels à droite
+        textFieldPrenom = new JTextField();
+        inputPanel.add(textFieldPrenom);
 
-        // Définition de la taille de la fenêtre
-        setSize(windowWidth, windowHeight);
+        JLabel labelNom = new JLabel("Nom:");
+        inputPanel.add(labelNom);
 
-        // Ajout des composants à la fenêtre
-        add(lablnom);
-        add(txtnom);
-        add(lablprenom);
-        add(txtprenom);
-        add(labldate_naissance);
-        add(txtdate_naissance);
-        add(labllieu_naissance);
-        add(txtlieu_naissance);
-        add(lablsexe);
-        add(txtsexe);
-        add(labltelephone);
-        add(txttelephone);
-        add(lablmatricule);
-        add(txtmatricule);
-        add(lablcni);
-        add(txtcni);
-        add(lablrole_id);
-        add(txtrole_id);
-        add(lablemail);
-        add(txtemail);
-        add(lablmot_de_passe);
-        add(txtmot_de_passe);
-        add(photoLabel);
-        add(choisirPhotoBtn);
+        textFieldNom = new JTextField();
+        inputPanel.add(textFieldNom);
 
-        // Création du panneau pour les boutons radio
-        JPanel panel = new JPanel(new GridLayout(0, 1));
-        TitledBorder border = BorderFactory.createTitledBorder("Sélection");
-        panel.setBorder(border);
-        lblancienEcole = new JLabel("Ancienne Ecole");
-        txtancienEcole = new JTextField();
-        lblancienEcole.setForeground(Color.BLUE);
+        JLabel labelDateNaissance = new JLabel("Date de naissance (AAAA-MM-JJ):");
+        inputPanel.add(labelDateNaissance);
 
-        ButtonGroup groupEcole = new ButtonGroup();
-        JRadioButton radio1 = new JRadioButton("Crêche", true);
-        JRadioButton radio2 = new JRadioButton("Ecole");
-        JRadioButton radio3 = new JRadioButton("aucune");
+        textFieldDateNaissance = new JTextField();
+        inputPanel.add(textFieldDateNaissance);
 
-        panel.add(lblancienEcole);
-        panel.add(txtancienEcole);
-        groupEcole.add(radio1);
-        panel.add(radio1);
-        groupEcole.add(radio2);
-        panel.add(radio2);
-        groupEcole.add(radio3);
-        panel.add(radio3);
+        JLabel labelLieuNaissance = new JLabel("Lieu de naissance:");
+        inputPanel.add(labelLieuNaissance);
 
-        lblstatutecole = new JLabel("Statut Ecole");
-        ButtonGroup groupStatut = new ButtonGroup();
-        JRadioButton radio4 = new JRadioButton("Privée", true);
-        JRadioButton radio5 = new JRadioButton("Public");
-        lblstatutecole.setForeground(Color.BLUE);
+        textFieldLieuNaissance = new JTextField();
+        inputPanel.add(textFieldLieuNaissance);
 
-        panel.add(lblstatutecole);
-        groupStatut.add(radio4);
-        panel.add(radio4);
-        groupStatut.add(radio5);
-        panel.add(radio5);
+        JLabel labelSexe = new JLabel("Sexe:");
+        inputPanel.add(labelSexe);
 
-        // Ajout du panneau à la fenêtre principale
-        add(panel, BorderLayout.SOUTH); // Ajoute le panneau en bas de la fenêtre principale
-        panel.add(enregistrerBtn);
+        comboBoxSexe = new JComboBox<>();
+        comboBoxSexe.addItem("Masculin");
+        comboBoxSexe.addItem("Féminin");
+        inputPanel.add(comboBoxSexe);
+
+        JLabel labelTelephone = new JLabel("Téléphone:");
+        inputPanel.add(labelTelephone);
+
+        textFieldTelephone = new JTextField();
+        inputPanel.add(textFieldTelephone);
+
+        JLabel labelMatricule = new JLabel("Matricule:");
+        inputPanel.add(labelMatricule);
+
+        textFieldMatricule = new JTextField();
+        inputPanel.add(textFieldMatricule);
+
+        JLabel labelCNI = new JLabel("CNI:");
+        inputPanel.add(labelCNI);
+
+        textFieldCNI = new JTextField();
+        inputPanel.add(textFieldCNI);
+
+        JLabel labelClasse = new JLabel("Classe:");
+        inputPanel.add(labelClasse);
+
+        comboBoxClasse = new JComboBox<>();
+        inputPanel.add(comboBoxClasse);
+
+        JLabel labelNiveau = new JLabel("Niveau:");
+        inputPanel.add(labelNiveau);
+
+        comboBoxNiveau = new JComboBox<>();
+        inputPanel.add(comboBoxNiveau);
+
+        JLabel labelNomEcole = new JLabel("Nom de l'école:");
+        inputPanel.add(labelNomEcole);
+
+        textFieldNomEcole = new JTextField();
+        inputPanel.add(textFieldNomEcole);
+
+        JLabel labelTypeEcole = new JLabel("Type de l'école:");
+        inputPanel.add(labelTypeEcole);
+
+        textFieldTypeEcole = new JTextField();
+        inputPanel.add(textFieldTypeEcole);
+
+        JLabel labelStatutEcole = new JLabel("Statut de l'école:");
+        inputPanel.add(labelStatutEcole);
+
+        textFieldStatutEcole = new JTextField();
+        inputPanel.add(textFieldStatutEcole);
+
+        JLabel labelEmail = new JLabel("Email:");
+        inputPanel.add(labelEmail);
+
+        textFieldEmail = new JTextField();
+        inputPanel.add(textFieldEmail);
+
+        JLabel labelMotDePasse = new JLabel("Mot de passe:");
+        inputPanel.add(labelMotDePasse);
+
+        passwordField = new JPasswordField();
+        inputPanel.add(passwordField);
+
+        JLabel labelFrais = new JLabel("Frais:");
+        inputPanel.add(labelFrais);
+
+        textFieldFrais = new JTextField();
+        inputPanel.add(textFieldFrais);
+
+        // Ajout des JComboBox pour les types de frais
+        JLabel labelTypeFrais = new JLabel("Type de frais:");
+        inputPanel.add(labelTypeFrais);
+
+        comboBoxTypeFrais = new JComboBox<>();
+        inputPanel.add(comboBoxTypeFrais);
+
+        // Connexion à la base de données et remplissage des listes
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            String url = "jdbc:mysql://localhost:3306/gestionScolaire";
+            String utilisateur = "root";
+            String motDePasse = "";
+
+            connexion = DriverManager.getConnection(url, utilisateur, motDePasse);
+
+            remplirListeClasses();
+            remplirListeNiveaux();
+            remplirListeTypesFrais();
+
+            JButton boutonAjouter = new JButton("Ajouter");
+            buttonPanel.add(boutonAjouter);
+
+            boutonAjouter.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    // Récupération des valeurs des champs de saisie
+                    String prenom = textFieldPrenom.getText();
+                    String nom = textFieldNom.getText();
+                    String dateNaissanceString = textFieldDateNaissance.getText();
+                    String lieuNaissance = textFieldLieuNaissance.getText();
+                    String sexe = (String) comboBoxSexe.getSelectedItem();
+                    String telephone = textFieldTelephone.getText();
+                    String matricule = textFieldMatricule.getText();
+                    String cni = textFieldCNI.getText();
+                    String classeSelectionnee = (String) comboBoxClasse.getSelectedItem();
+                    String niveauSelectionne = (String) comboBoxNiveau.getSelectedItem();
+                    String typeFraisSelectionne = (String) comboBoxTypeFrais.getSelectedItem();
+                    double frais = Double.parseDouble(textFieldFrais.getText());
+                    String nomEcole = textFieldNomEcole.getText();
+                    String typeEcole = textFieldTypeEcole.getText();
+                    String statutEcole = textFieldStatutEcole.getText();
+                    String email = textFieldEmail.getText();
+                    String motDePasse = new String(passwordField.getPassword());
+
+                    // Conversion de la date de naissance en objet Date
+                    java.util.Date dateNaissanceUtil = null;
+                    try {
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                        dateNaissanceUtil = dateFormat.parse(dateNaissanceString);
+                    } catch (ParseException ex) {
+                        JOptionPane.showMessageDialog(AjoutEleve.this, "Format de date incorrect ! Utilisez yyyy-MM-dd");
+                        return;
+                    }
+                    java.sql.Date dateNaissanceSQL = new java.sql.Date(dateNaissanceUtil.getTime());
+
+                    // Récupération des ID correspondants
+                    int idClasse = getIdClasse(classeSelectionnee);
+                    int idNiveau = getIdNiveau(niveauSelectionne);
+                    int idTypeFrais = getIdTypeFrais(typeFraisSelectionne);
+                    int idEcole = ajouterAncienneEcole(nomEcole, typeEcole, statutEcole);
+
+                    // Appel de la méthode pour ajouter l'élève
+                    ajouterEleve(prenom, nom, dateNaissanceSQL, lieuNaissance, sexe, cheminPhoto, telephone, matricule, cni, idClasse, idNiveau, idEcole, email, motDePasse, frais);
+
+                }
+            });
+
+        } catch (SQLException | ClassNotFoundException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erreur : " + ex.getMessage());
+        }
 
         setVisible(true);
+    }
 
-        enregistrerBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String ajouterEleve = "INSERT INTO utilisateur (prenom, nom, date_naissance, lieu_naissance, sexe, photo, telephone, matricule, cni, role_id, email, mot_de_passe) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-                try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/gestionScolaire", "root", "");
-                     PreparedStatement pstmt = conn.prepareStatement(ajouterEleve)) {
-
-                    pstmt.setString(1, txtprenom.getText());
-                    pstmt.setString(2, txtnom.getText());
-                    pstmt.setString(3, txtdate_naissance.getText());
-                    pstmt.setString(4, txtlieu_naissance.getText());
-                    pstmt.setString(5, txtsexe.getText());
-                    pstmt.setString(6,txtphoto.getText());
-                    pstmt.setString(7, txttelephone.getText());
-                    pstmt.setString(8, txtmatricule.getText());
-                    pstmt.setString(9, txtcni.getText());
-                    pstmt.setString(10, txtrole_id.getText());
-                    pstmt.setString(11, txtemail.getText());
-                    pstmt.setString(12, txtmot_de_passe.getText());
-
-                    // Lecture de l'image à partir du fichier sélectionné et stockage dans un tableau de bytes
-
-                    File selectedFile = new File(txtphoto.getText());
-                    FileInputStream fis = new FileInputStream(selectedFile);
-                    System.out.println(selectedFile);
-                    /*byte[] imageBytes = new byte[(int) selectedFile.length()];
-                    fis.read(imageBytes);
-                    fis.close();*/
-
-                    // Insérer le tableau de bytes dans la base de données en tant que paramètre de type BLOB
-                   // pstmt.setBytes(6, imageBytes);
-
-                    int rowsAffected = pstmt.executeUpdate();
-
-                    if (rowsAffected > 0) {
-                        System.out.println(rowsAffected + " lignes ont été insérées avec succès.");
-                        JOptionPane.showMessageDialog(enregistrerBtn, "L'ajout de l'élève a réussi.");
-                    } else {
-                        System.out.println("Aucune ligne n'a été insérée.");
-                        JOptionPane.showMessageDialog(enregistrerBtn, "L'ajout de l'élève a échoué.");
-                    }
-                } catch (SQLException | IOException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(enregistrerBtn, "Erreur lors de l'ajout de l'élève : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
-                }
+    // Méthode pour remplir la liste des types de frais à partir de la base de données
+    private void remplirListeTypesFrais() {
+        String sql = "SELECT type_frais FROM frais";
+        try (PreparedStatement preparedStatement = connexion.prepareStatement(sql);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+            while (resultSet.next()) {
+                String typeFrais = resultSet.getString("type_frais");
+                comboBoxTypeFrais.addItem(typeFrais);
             }
-        });
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erreur SQL : " + ex.getMessage());
+        }
+    }
 
+
+    // Méthode pour afficher la photo sélectionnée
+    private void afficherPhoto() {
+        ImageIcon imageIcon = new ImageIcon(cheminPhoto);
+        // Redimensionner l'image pour s'adapter au JLabel
+        Image image = imageIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+        imageIcon = new ImageIcon(image);
+        labelPhoto.setIcon(imageIcon);
+    }
+
+    private void remplirListeClasses() {
+        String sql = "SELECT surnom_classe FROM classe";
+
+        try (PreparedStatement preparedStatement = connexion.prepareStatement(sql);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+            while (resultSet.next()) {
+                String nomClasse = resultSet.getString("surnom_classe");
+                comboBoxClasse.addItem(nomClasse);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erreur SQL : " + ex.getMessage());
+        }
+    }
+
+    private void remplirListeNiveaux() {
+        String sql = "SELECT nom_niveau FROM niveau";
+
+        try (PreparedStatement preparedStatement = connexion.prepareStatement(sql);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+            while (resultSet.next()) {
+                String nomNiveau = resultSet.getString("nom_niveau");
+                comboBoxNiveau.addItem(nomNiveau);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erreur SQL : " + ex.getMessage());
+        }
+    }
+
+    private int getIdClasse(String nomClasse) {
+        String sql = "SELECT id FROM classe WHERE surnom_classe = ?";
+        int idClasse = -1;
+
+        try (PreparedStatement preparedStatement = connexion.prepareStatement(sql)) {
+            preparedStatement.setString(1, nomClasse);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                idClasse = resultSet.getInt("id");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erreur SQL : " + ex.getMessage());
+        }
+
+        return idClasse;
+    }
+
+    private int getIdNiveau(String nomNiveau) {
+        String sql = "SELECT id_niveau FROM niveau WHERE nom_niveau = ?";
+        int idNiveau = -1;
+
+        try (PreparedStatement preparedStatement = connexion.prepareStatement(sql)) {
+            preparedStatement.setString(1, nomNiveau);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                idNiveau = resultSet.getInt("id_niveau");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erreur SQL : " + ex.getMessage());
+        }
+
+        return idNiveau;
+    }
+
+    private int getIdTypeFrais(String typeFrais) {
+        String sql = "SELECT id FROM frais WHERE type_frais = ?";
+        int idTypeFrais = -1;
+
+        try (PreparedStatement preparedStatement = connexion.prepareStatement(sql)) {
+            preparedStatement.setString(1, typeFrais);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                idTypeFrais = resultSet.getInt("id");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erreur SQL : " + ex.getMessage());
+        }
+
+        return idTypeFrais;
+    }
+
+
+    private int ajouterAncienneEcole(String nomEcole, String typeEcole, String statutEcole) {
+        String sql = "INSERT INTO ancienne_ecole (nom_ecole, type_ecole, statut_ecole) VALUES (?, ?, ?)";
+
+        try (PreparedStatement preparedStatement = connexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            preparedStatement.setString(1, nomEcole);
+            preparedStatement.setString(2, typeEcole);
+            preparedStatement.setString(3, statutEcole);
+            preparedStatement.executeUpdate();
+
+            ResultSet resultSet = preparedStatement.getGeneratedKeys();
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erreur SQL : " + ex.getMessage());
+        }
+
+        return -1;
+    }
+
+    private void ajouterEleve(String prenom, String nom, Date dateNaissance, String lieuNaissance, String sexe, String photo, String telephone, String matricule, String cni, int idClasse, int idNiveau, int idEcole, String email, String motDePasse, double frais) {
+        String sql = "INSERT INTO eleve (prenom, nom, date_naissance, lieu_naissance, sexe, photo, telephone, matricule, cni, classe_id, niveau_id, id_ancienne_ecole, email, mot_de_passe, frais) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement preparedStatement = connexion.prepareStatement(sql)) {
+            preparedStatement.setString(1, prenom);
+            preparedStatement.setString(2, nom);
+            preparedStatement.setObject(3, new java.sql.Date(dateNaissance.getTime()));
+            preparedStatement.setString(4, lieuNaissance);
+            preparedStatement.setString(5, sexe);
+            preparedStatement.setString(6, photo);
+            preparedStatement.setString(7, telephone);
+            preparedStatement.setString(8, matricule);
+            preparedStatement.setString(9, cni);
+            preparedStatement.setInt(10, idClasse);
+            preparedStatement.setInt(11, idNiveau);
+            preparedStatement.setInt(12, idEcole);
+            preparedStatement.setString(13, email);
+            preparedStatement.setString(14, motDePasse);
+            preparedStatement.setDouble(15, frais);
+
+            int lignesAffectees = preparedStatement.executeUpdate();
+
+            if (lignesAffectees > 0) {
+                JOptionPane.showMessageDialog(this, "L'élève a été ajouté avec succès !");
+            } else {
+                JOptionPane.showMessageDialog(this, "Erreur : L'élève n'a pas pu être ajouté.");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erreur SQL : " + ex.getMessage());
+        }
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(AjoutEleve::new);
     }
 }
+*/
+
+
+
+
+
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+public class AjoutEleve extends JFrame {
+    private JTextField textFieldPrenom;
+    private JTextField textFieldNom;
+    private JTextField textFieldDateNaissance;
+    private JTextField textFieldLieuNaissance;
+    private JComboBox<String> comboBoxSexe;
+    private JTextField textFieldTelephone;
+    private JTextField textFieldMatricule;
+    private JTextField textFieldCNI;
+    private JComboBox<String> comboBoxClasse;
+    private JComboBox<String> comboBoxNiveau;
+    private JTextField textFieldNomEcole;
+    private JTextField textFieldTypeEcole;
+    private JTextField textFieldStatutEcole;
+    private JTextField textFieldEmail;
+    private JPasswordField passwordField;
+   // private JTextField textFieldFrais;
+    private JComboBox<String> comboBoxTypeFrais;
+    private Connection connexion;
+    private JLabel labelPhoto;
+    private String cheminPhoto = "";
+
+    public AjoutEleve() {
+        setTitle("Ajouter un élève");
+        setSize(800, 400); // Augmenter la largeur pour le formulaire
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        splitPane.setDividerLocation(220); // Réglez la proportion du split
+        getContentPane().add(splitPane, BorderLayout.CENTER);
+
+        JPanel leftPanel = new JPanel(new BorderLayout());
+        splitPane.setLeftComponent(leftPanel);
+
+        JPanel inputPanel = new JPanel(new GridLayout(0, 2));
+        leftPanel.add(inputPanel, BorderLayout.CENTER);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        leftPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        // JPanel pour la photo
+        JPanel rightPanel = new JPanel(new BorderLayout());
+        splitPane.setRightComponent(rightPanel);
+
+        // JPanel pour la photo et le bouton "Ajouter une photo"
+        JPanel photoPanel = new JPanel(new BorderLayout());
+        rightPanel.add(photoPanel, BorderLayout.CENTER);
+
+        // JLabel pour afficher la photo
+        labelPhoto = new JLabel("Aucune photo sélectionnée", SwingConstants.CENTER);
+        photoPanel.add(labelPhoto, BorderLayout.WEST);
+
+        // Bouton pour ajouter une photo
+        JButton boutonAjouterPhoto = new JButton("Ajouter photo");
+        photoPanel.add(boutonAjouterPhoto, BorderLayout.EAST);
+        boutonAjouterPhoto.setBackground(Color.BLUE);
+
+        boutonAjouterPhoto.setPreferredSize(new Dimension(102, 30)); // Définir une taille spécifique au bouton
+
+        boutonAjouterPhoto.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                int returnValue = fileChooser.showOpenDialog(null);
+                if (returnValue == JFileChooser.APPROVE_OPTION) {
+                    File selectedFile = fileChooser.getSelectedFile();
+                    cheminPhoto = selectedFile.getAbsolutePath();
+                    JOptionPane.showMessageDialog(AjoutEleve.this, "Photo sélectionnée : " + cheminPhoto);
+
+                    // Afficher la photo sélectionnée
+                    afficherPhoto();
+                }
+            }
+        });
+
+        // Ajout des composants pour les champs de saisie
+
+        JLabel labelPrenom = new JLabel("Prénom:");
+        inputPanel.add(labelPrenom);
+
+        textFieldPrenom = new JTextField();
+        inputPanel.add(textFieldPrenom);
+
+        JLabel labelNom = new JLabel("Nom:");
+        inputPanel.add(labelNom);
+
+        textFieldNom = new JTextField();
+        inputPanel.add(textFieldNom);
+
+        JLabel labelDateNaissance = new JLabel("Date de naissance (AAAA-MM-JJ):");
+        inputPanel.add(labelDateNaissance);
+
+        textFieldDateNaissance = new JTextField();
+        inputPanel.add(textFieldDateNaissance);
+
+        JLabel labelLieuNaissance = new JLabel("Lieu de naissance:");
+        inputPanel.add(labelLieuNaissance);
+
+        textFieldLieuNaissance = new JTextField();
+        inputPanel.add(textFieldLieuNaissance);
+
+        JLabel labelSexe = new JLabel("Sexe:");
+        inputPanel.add(labelSexe);
+
+        comboBoxSexe = new JComboBox<>();
+        comboBoxSexe.addItem("Masculin");
+        comboBoxSexe.addItem("Féminin");
+        inputPanel.add(comboBoxSexe);
+
+        JLabel labelTelephone = new JLabel("Téléphone:");
+        inputPanel.add(labelTelephone);
+
+        textFieldTelephone = new JTextField();
+        inputPanel.add(textFieldTelephone);
+
+        JLabel labelMatricule = new JLabel("Matricule:");
+        inputPanel.add(labelMatricule);
+
+        textFieldMatricule = new JTextField();
+        inputPanel.add(textFieldMatricule);
+
+        JLabel labelCNI = new JLabel("CNI:");
+        inputPanel.add(labelCNI);
+
+        textFieldCNI = new JTextField();
+        inputPanel.add(textFieldCNI);
+
+        JLabel labelClasse = new JLabel("Classe:");
+        inputPanel.add(labelClasse);
+
+        comboBoxClasse = new JComboBox<>();
+        inputPanel.add(comboBoxClasse);
+
+        JLabel labelNiveau = new JLabel("Niveau:");
+        inputPanel.add(labelNiveau);
+
+        comboBoxNiveau = new JComboBox<>();
+        inputPanel.add(comboBoxNiveau);
+
+        JLabel labelNomEcole = new JLabel("Nom de l'école:");
+        inputPanel.add(labelNomEcole);
+
+        textFieldNomEcole = new JTextField();
+        inputPanel.add(textFieldNomEcole);
+
+        JLabel labelTypeEcole = new JLabel("Type de l'école:");
+        inputPanel.add(labelTypeEcole);
+
+        textFieldTypeEcole = new JTextField();
+        inputPanel.add(textFieldTypeEcole);
+
+        JLabel labelStatutEcole = new JLabel("Statut de l'école:");
+        inputPanel.add(labelStatutEcole);
+
+        textFieldStatutEcole = new JTextField();
+        inputPanel.add(textFieldStatutEcole);
+
+        JLabel labelEmail = new JLabel("Email:");
+        inputPanel.add(labelEmail);
+
+        textFieldEmail = new JTextField();
+        inputPanel.add(textFieldEmail);
+
+        JLabel labelMotDePasse = new JLabel("Mot de passe:");
+        inputPanel.add(labelMotDePasse);
+
+        passwordField = new JPasswordField();
+        inputPanel.add(passwordField);
+
+        /*JLabel labelFrais = new JLabel("Frais:");
+        inputPanel.add(labelFrais);
+
+        textFieldFrais = new JTextField();
+        inputPanel.add(textFieldFrais);*/
+
+        // Ajout des JComboBox pour les types de frais
+        JLabel labelTypeFrais = new JLabel("Type de frais:");
+        inputPanel.add(labelTypeFrais);
+
+        comboBoxTypeFrais = new JComboBox<>();
+        inputPanel.add(comboBoxTypeFrais);
+
+        // Connexion à la base de données et remplissage des listes
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            String url = "jdbc:mysql://localhost:3306/gestionScolaire";
+            String utilisateur = "root";
+            String motDePasse = "";
+
+            connexion = DriverManager.getConnection(url, utilisateur, motDePasse);
+
+            remplirListeClasses();
+            remplirListeNiveaux();
+            remplirListeTypesFrais();
+
+            JButton boutonAjouter = new JButton("Ajouter");
+            buttonPanel.add(boutonAjouter);
+
+            boutonAjouter.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    // Récupération des valeurs des champs de saisie
+                    String prenom = textFieldPrenom.getText();
+                    String nom = textFieldNom.getText();
+                    String dateNaissanceString = textFieldDateNaissance.getText();
+                    String lieuNaissance = textFieldLieuNaissance.getText();
+                    String sexe = (String) comboBoxSexe.getSelectedItem();
+                    String telephone = textFieldTelephone.getText();
+                    String matricule = textFieldMatricule.getText();
+                    String cni = textFieldCNI.getText();
+                    String classeSelectionnee = (String) comboBoxClasse.getSelectedItem();
+                    String niveauSelectionne = (String) comboBoxNiveau.getSelectedItem();
+                    String nomEcole = textFieldNomEcole.getText();
+                    String typeEcole = textFieldTypeEcole.getText();
+                    String statutEcole = textFieldStatutEcole.getText();
+                    String typeFraisSelectionne = (String) comboBoxTypeFrais.getSelectedItem();
+                    //double frais = Double.parseDouble(textFieldFrais.getText());
+
+                    // Conversion de la date de naissance en objet Date
+                    java.util.Date dateNaissanceUtil = null;
+                    try {
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                        dateNaissanceUtil = dateFormat.parse(dateNaissanceString);
+                    } catch (ParseException ex) {
+                        JOptionPane.showMessageDialog(AjoutEleve.this, "Format de date incorrect ! Utilisez yyyy-MM-dd");
+                        return;
+                    }
+                    java.sql.Date dateNaissanceSQL = new java.sql.Date(dateNaissanceUtil.getTime());
+
+                    // Récupération des ID correspondants
+                    int idClasse = getIdClasse(classeSelectionnee);
+                    int idNiveau = getIdNiveau(niveauSelectionne);
+                    int idTypeFrais = getIdTypeFrais(typeFraisSelectionne);
+
+                    // Appel de la méthode pour ajouter l'élève
+                    ajouterEleve(prenom, nom, dateNaissanceSQL, lieuNaissance, sexe, cheminPhoto, telephone, matricule, cni, idClasse, idNiveau, nomEcole, typeEcole, statutEcole, textFieldEmail.getText(), new String(passwordField.getPassword()), idTypeFrais);
+
+                }
+            });
+
+        } catch (SQLException | ClassNotFoundException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erreur : " + ex.getMessage());
+        }
+
+        setVisible(true);
+    }
+
+    // Méthode pour remplir la liste des types de frais à partir de la base de données
+    private void remplirListeTypesFrais() {
+        String sql = "SELECT type_frais FROM frais";
+        try (PreparedStatement preparedStatement = connexion.prepareStatement(sql);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+            while (resultSet.next()) {
+                String typeFrais = resultSet.getString("type_frais");
+                comboBoxTypeFrais.addItem(typeFrais);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erreur SQL : " + ex.getMessage());
+        }
+    }
+
+    // Méthode pour afficher la photo sélectionnée
+    private void afficherPhoto() {
+        ImageIcon imageIcon = new ImageIcon(cheminPhoto);
+        // Redimensionner l'image pour s'adapter au JLabel
+        Image image = imageIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+        imageIcon = new ImageIcon(image);
+        labelPhoto.setIcon(imageIcon);
+    }
+
+    private void remplirListeClasses() {
+        String sql = "SELECT surnom_classe FROM classe";
+
+        try (PreparedStatement preparedStatement = connexion.prepareStatement(sql);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+            while (resultSet.next()) {
+                String nomClasse = resultSet.getString("surnom_classe");
+                comboBoxClasse.addItem(nomClasse);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erreur SQL : " + ex.getMessage());
+        }
+    }
+
+    private void remplirListeNiveaux() {
+        String sql = "SELECT nom_niveau FROM niveau";
+
+        try (PreparedStatement preparedStatement = connexion.prepareStatement(sql);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+            while (resultSet.next()) {
+                String nomNiveau = resultSet.getString("nom_niveau");
+                comboBoxNiveau.addItem(nomNiveau);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erreur SQL : " + ex.getMessage());
+        }
+    }
+
+    private int getIdClasse(String nomClasse) {
+        String sql = "SELECT id FROM classe WHERE surnom_classe = ?";
+        int idClasse = -1;
+
+        try (PreparedStatement preparedStatement = connexion.prepareStatement(sql)) {
+            preparedStatement.setString(1, nomClasse);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                idClasse = resultSet.getInt("id");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erreur SQL : " + ex.getMessage());
+        }
+
+        return idClasse;
+    }
+
+    private int getIdNiveau(String nomNiveau) {
+        String sql = "SELECT id_niveau FROM niveau WHERE nom_niveau = ?";
+        int idNiveau = -1;
+
+        try (PreparedStatement preparedStatement = connexion.prepareStatement(sql)) {
+            preparedStatement.setString(1, nomNiveau);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                idNiveau = resultSet.getInt("id_niveau");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erreur SQL : " + ex.getMessage());
+        }
+
+        return idNiveau;
+    }
+
+    private int getIdTypeFrais(String typeFrais) {
+        String sql = "SELECT id FROM frais WHERE type_frais = ?";
+        int idTypeFrais = -1;
+
+        try (PreparedStatement preparedStatement = connexion.prepareStatement(sql)) {
+            preparedStatement.setString(1, typeFrais);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                idTypeFrais = resultSet.getInt("id");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erreur SQL : " + ex.getMessage());
+        }
+
+        return idTypeFrais;
+    }
+
+    private int ajouterAncienneEcole(String nomEcole, String typeEcole, String statutEcole) {
+        String sql = "INSERT INTO ancienne_ecole (nom_ecole, type_ecole, statut_ecole) VALUES (?, ?, ?)";
+        int idEcole = -1;
+
+        try (PreparedStatement preparedStatement = connexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            preparedStatement.setString(1, nomEcole);
+            preparedStatement.setString(2, typeEcole);
+            preparedStatement.setString(3, statutEcole);
+            preparedStatement.executeUpdate();
+
+            ResultSet resultSet = preparedStatement.getGeneratedKeys();
+            if (resultSet.next()) {
+                idEcole = resultSet.getInt(1);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erreur SQL : " + ex.getMessage());
+        }
+
+        return idEcole;
+    }
+
+    private void ajouterEleve(String prenom, String nom, Date dateNaissance, String lieuNaissance, String sexe, String photo, String telephone, String matricule, String cni, int idClasse, int idNiveau, String nomEcole, String typeEcole, String statutEcole, String email, String motDePasse, int idFrais) {
+        int role_id = 2;
+        String sql = "INSERT INTO utilisateur (prenom, nom, date_naissance, lieu_naissance, sexe, photo, telephone, matricule, cni, classe_id, niveau_id, anEcole_id, email, mot_de_passe, frais_id, role_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement preparedStatement = connexion.prepareStatement(sql)) {
+            preparedStatement.setString(1, prenom);
+            preparedStatement.setString(2, nom);
+            preparedStatement.setObject(3, new java.sql.Date(dateNaissance.getTime()));
+            preparedStatement.setString(4, lieuNaissance);
+            preparedStatement.setString(5, sexe);
+            preparedStatement.setString(6, photo);
+            preparedStatement.setString(7, telephone);
+            preparedStatement.setString(8, matricule);
+            preparedStatement.setString(9, cni);
+            preparedStatement.setInt(10, idClasse);
+            preparedStatement.setInt(11, idNiveau);
+            preparedStatement.setInt(12, ajouterAncienneEcole(nomEcole, typeEcole, statutEcole));
+            preparedStatement.setString(13, email);
+            preparedStatement.setString(14, motDePasse);
+            preparedStatement.setDouble(15, idFrais);
+            preparedStatement.setInt(16, role_id);
+
+            int lignesAffectees = preparedStatement.executeUpdate();
+
+            if (lignesAffectees > 0) {
+                JOptionPane.showMessageDialog(this, "L'élève a été ajouté avec succès !");
+            } else {
+                JOptionPane.showMessageDialog(this, "Erreur : L'élève n'a pas pu être ajouté.");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erreur SQL : " + ex.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(AjoutEleve::new);
+    }
+}
+
+
 
